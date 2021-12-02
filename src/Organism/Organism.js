@@ -1,4 +1,3 @@
-const CellStates = require("./Cell/CellStates");
 const Neighbors = require("../Grid/Neighbors");
 const Hyperparams = require("../Hyperparameters");
 const Directions = require("./Directions");
@@ -11,6 +10,7 @@ class Organism {
         this.c = col;
         this.r = row;
         this.env = env;
+        this.CellRegistry = env.Registry.Cells;
         this.lifetime = 0;
         this.food_collected = 0;
         this.living = true;
@@ -130,7 +130,7 @@ class Organism {
             // console.log("add cell")
 
             var branch = this.anatomy.getRandomCell();
-            var state = CellStates.getRandomLivingType();//branch.state;
+            var state = this.env.Registry.getRandomLivingType();//branch.state;
             var growth_direction = Neighbors.all[Math.floor(Math.random() * Neighbors.all.length)]
             var c = branch.loc_col+growth_direction[0];
             var r = branch.loc_row+growth_direction[1];
@@ -142,7 +142,7 @@ class Organism {
         else if (choice <= Hyperparams.addProb + Hyperparams.changeProb){
             // change cell
             var cell = this.anatomy.getRandomCell();
-            var state = CellStates.getRandomLivingType();
+            var state = this.env.Registry.getRandomLivingType();
             // console.log("change cell", state)
             this.anatomy.replaceCell(state, cell.loc_col, cell.loc_row);
             mutated = true;
@@ -169,7 +169,7 @@ class Organism {
             for (var cell of this.anatomy.cells) {
                 var real_c = this.c + cell.rotatedCol(this.rotation);
                 var real_r = this.r + cell.rotatedRow(this.rotation);
-                this.env.changeCell(real_c, real_r, CellStates.empty, null);
+                this.env.changeCell(real_c, real_r, this.CellRegistry.GetByName('empty'), null);
             }
             this.c = new_c;
             this.r = new_r;
@@ -190,7 +190,7 @@ class Organism {
             for (var cell of this.anatomy.cells) {
                 var real_c = this.c + cell.rotatedCol(this.rotation);
                 var real_r = this.r + cell.rotatedRow(this.rotation);
-                this.env.changeCell(real_c, real_r, CellStates.empty, null);
+                this.env.changeCell(real_c, real_r, this.CellRegistry.GetByName('empty'), null);
             }
             this.rotation = new_rotation;
             this.direction = Directions.getRandomDirection();
@@ -239,7 +239,7 @@ class Organism {
     }
 
     isPassableCell(cell, parent){
-        return cell != null && (cell.state == CellStates.empty || cell.owner == this || cell.owner == parent || cell.state == CellStates.food);
+        return cell != null && (cell.state == this.CellRegistry.GetByName('empty') || cell.owner == this || cell.owner == parent || cell.state == this.CellRegistry.GetByName('food'));
     }
 
     isClear(col, row, rotation=this.rotation, ignore_armor=false) {
@@ -249,7 +249,10 @@ class Organism {
                 return false;
             }
             // console.log(cell.owner == this)
-            if (cell.owner==this || cell.state==CellStates.empty || (!Hyperparams.foodBlocksReproduction && cell.state==CellStates.food) || (ignore_armor && loccell.state==CellStates.armor && cell.state==CellStates.food)){
+            var emptyState = this.CellRegistry.GetByName('empty');
+            var foodState = this.CellRegistry.GetByName('food');
+            var armorState = this.CellRegistry.GetByName('armor');
+            if (cell.owner==this || cell.state==emptyState || (!Hyperparams.foodBlocksReproduction && cell.state==foodState) || (ignore_armor && loccell.state==armorState && cell.state==foodState)){
                 continue;
             }
             return false;
@@ -268,7 +271,7 @@ class Organism {
         for (var cell of this.anatomy.cells) {
             var real_c = this.c + cell.rotatedCol(this.rotation);
             var real_r = this.r + cell.rotatedRow(this.rotation);
-            this.env.changeCell(real_c, real_r, CellStates.food, null);
+            this.env.changeCell(real_c, real_r, this.CellRegistry.GetByName('food'), null);
         }
         this.species.decreasePop();
         this.living = false;

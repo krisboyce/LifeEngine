@@ -1,6 +1,5 @@
 const Hyperparams = require("../../Hyperparameters");
 const Directions = require("../Directions");
-const CellStates = require("../Cell/CellStates");
 
 const Decision = {
     neutral: 0,
@@ -21,24 +20,21 @@ class Brain {
 
         // corresponds to CellTypes
         this.decisions = [];
-        this.decisions[CellStates.empty.name] = Decision.neutral;
-        this.decisions[CellStates.food.name] = Decision.chase;
-        this.decisions[CellStates.wall.name] = Decision.neutral;
-        this.decisions[CellStates.mouth.name] = Decision.neutral;
-        this.decisions[CellStates.producer.name] = Decision.neutral;
-        this.decisions[CellStates.mover.name] = Decision.neutral;
-        this.decisions[CellStates.killer.name] = Decision.retreat;
-        this.decisions[CellStates.armor.name] = Decision.neutral;
-        this.decisions[CellStates.eye.name] = Decision.neutral;
+        const names = owner.env.Register.Cells.All().map(x => x.name).forEach(name => {
+            this.decisions[name] = Decision.neutral;
+        });
+
+        this.decisions['food'] = Decision.chase;
+        this.decisions['killer'] = Decision.retreat;
     }
 
     randomizeDecisions() {
         // randomize the non obvious decisions
-        this.decisions[CellStates.mouth.name] = Decision.getRandom();
-        this.decisions[CellStates.producer.name] = Decision.getRandom();
-        this.decisions[CellStates.mover.name] = Decision.getRandom();
-        this.decisions[CellStates.armor.name] = Decision.getRandom();
-        this.decisions[CellStates.eye.name] = Decision.getRandom();
+        this.decisions['mouth'] = Decision.getRandom();
+        this.decisions['producer'] = Decision.getRandom();
+        this.decisions['mover'] = Decision.getRandom();
+        this.decisions['armor'] = Decision.getRandom();
+        this.decisions['eye'] = Decision.getRandom();
     }
 
     observe(observation) {
@@ -74,8 +70,8 @@ class Brain {
     }
 
     mutate() {
-        this.decisions[CellStates.getRandomName()] = Decision.getRandom();
-        this.decisions[CellStates.empty.name] = Decision.neutral; // if the empty cell has a decision it gets weird
+        this.decisions[this.owner.env.Registry.getRandomName()] = Decision.getRandom();
+        this.decisions['empty'] = Decision.neutral; // if the empty cell has a decision it gets weird
     }
 }
 

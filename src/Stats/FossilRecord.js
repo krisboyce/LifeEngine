@@ -1,4 +1,3 @@
-const CellStates = require("../Organism/Cell/CellStates");
 const Species = require("./Species");
 
 const FossilRecord = {
@@ -94,7 +93,7 @@ const FossilRecord = {
     calcCellCountAverages() {
         var total_org = 0;
         var cell_counts = {};
-        for (let c of CellStates.living) {
+        for (let c of this.env.Registry.LivingStates()) {
             cell_counts[c.name] = 0;
         }
         var first=true;

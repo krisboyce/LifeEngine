@@ -1,10 +1,9 @@
-const CellStates = require("../CellStates");
 const BodyCell = require("./BodyCell");
 const Hyperparams = require("../../../Hyperparameters");
 
 class MouthCell extends BodyCell{
     constructor(org, loc_col, loc_row){
-        super(CellStates.mouth, org, loc_col, loc_row);
+        super(org, loc_col, loc_row);
     }
 
     performFunction() {
@@ -20,8 +19,8 @@ class MouthCell extends BodyCell{
     eatNeighbor(n_cell, env) {
         if (n_cell == null)
             return;
-        if (n_cell.state == CellStates.food){
-            env.changeCell(n_cell.col, n_cell.row, CellStates.empty, null);
+        if (n_cell.state == env.Registry.Cells.GetByName('food')){
+            env.changeCell(n_cell.col, n_cell.row, env.Registry.Cells.GetByName('empty'), null);
             this.org.food_collected++;
         }
     }

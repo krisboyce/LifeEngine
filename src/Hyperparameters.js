@@ -10,6 +10,7 @@ const Hyperparams = {
         this.killableNeighbors = Neighbors.adjacent;
         this.edibleNeighbors = Neighbors.adjacent;
         this.growableNeighbors = Neighbors.adjacent;
+        this.breathableNeighbors = Neighbors.all;
 
         this.useGlobalMutability = false;
         this.globalMutability = 5;

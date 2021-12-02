@@ -1,12 +1,12 @@
-const CellStates = require("../../Organism/Cell/CellStates");
 const FossilRecord = require("../FossilRecord");
 const ChartController = require("./ChartController");
 
 class CellsChart extends ChartController {
-    constructor() {
+    constructor(registry) {
         super("Organism Size / Composition", 
             "Avg. Number of Cells per Organism",
             "Note: to maintain efficiency, species with very small populations are discarded when collecting cell statistics.");
+        this.registry = registry;
     }
 
     setData() {
@@ -22,7 +22,7 @@ class CellsChart extends ChartController {
                 dataPoints: []
             }
         );
-        for (var c of CellStates.living) {
+        for (var c of this.registry.LivingStates()) {
             this.data.push({
                 type: "line",
                 markerType: "none",

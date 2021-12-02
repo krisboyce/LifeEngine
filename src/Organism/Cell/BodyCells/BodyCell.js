@@ -1,10 +1,8 @@
-const CellStates = require("../CellStates");
 const Directions = require("../../Directions");
 
 // A body cell defines the relative location of the cell in it's parent organism. It also defines their functional behavior.
 class BodyCell{
-    constructor(state, org, loc_col, loc_row){
-        this.state = state;
+    constructor(org, loc_col, loc_row){
         this.org = org;
         this.loc_col = loc_col;
         this.loc_row = loc_row;
@@ -13,6 +11,10 @@ class BodyCell{
         if (this.org.anatomy.birth_distance < distance) {
             this.org.anatomy.birth_distance = distance;
         }
+    }
+
+    setState(state) {
+        this.state = state;
     }
 
     initInherit(parent) {
@@ -73,6 +75,8 @@ class BodyCell{
                 return this.loc_col;
         }
     }
+
+    
 }
 
 module.exports = BodyCell;

@@ -1,8 +1,9 @@
 const Cell = require('../Organism/Cell/GridCell');
-const CellStates = require('../Organism/Cell/CellStates');
 
 class GridMap {
-    constructor(cols, rows, cell_size) {
+    constructor(env, cells, cols, rows, cell_size) {
+        this.env = env;
+        this.Cells = cells;
         this.resize(cols, rows, cell_size);
     }
 
@@ -14,7 +15,7 @@ class GridMap {
         for(var c=0; c<cols; c++) {
             var row = [];
             for(var r=0; r<rows; r++) {
-                var cell = new Cell(CellStates.empty, c, r, c*cell_size, r*cell_size);
+                var cell = new Cell(this.Cells.GetByName('empty'), c, r, c*cell_size, r*cell_size);
                 row.push(cell);
             }            
             this.grid.push(row);
@@ -39,6 +40,7 @@ class GridMap {
     }
 
     setCellType(col, row, state) {
+        if (!state) throw new Error("State for cell must be defined.");
         if (!this.isValidLoc(col, row)) {
             return;
         }

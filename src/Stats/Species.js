@@ -1,4 +1,3 @@
-const CellStates = require("../Organism/Cell/CellStates");
 
 class Species {
     constructor(anatomy, ancestor, start_tick) {
@@ -21,7 +20,7 @@ class Species {
 
     calcAnatomyDetails() {
         var cell_counts = {};
-        for (let c of CellStates.living) {
+        for (let c of this.anatomy.owner.env.Registry.Cells.WithTag('living')) {
             cell_counts[c.name] = 0;
         }
         for (let cell of this.anatomy.cells) {

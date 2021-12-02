@@ -1,9 +1,12 @@
-const CellStates = require("./Cell/CellStates");
 const BodyCellFactory = require("./Cell/BodyCells/BodyCellFactory");
+const EyeCell = require("./Cell/BodyCells/EyeCell");
+const MoverCell = require("./Cell/BodyCells/MoverCell");
+const ProducerCell = require("./Cell/BodyCells/ProducerCell");
 
 class Anatomy {
     constructor(owner) {
         this.owner = owner;
+        this.CellRegistry = owner.env.Registry.Cells;
         this.cells = [];
         this.is_producer = false;
         this.is_mover = false;
@@ -27,7 +30,7 @@ class Anatomy {
     }
 
     addRandomizedCell(state, c, r) {
-        if (state==CellStates.eye && !this.has_eyes) {
+        if (state==this.CellRegistry.GetByType(EyeCell) && !this.has_eyes) {
             this.owner.brain.randomizeDecisions();
         }
         var new_cell = BodyCellFactory.createRandom(this.owner, state, c, r);
@@ -79,11 +82,11 @@ class Anatomy {
         this.is_mover = false;
         this.has_eyes = false;
         for (var cell of this.cells) {
-            if (cell.state == CellStates.producer)
+            if (cell.state == this.CellRegistry.GetByType(ProducerCell))
                 this.is_producer = true;
-            if (cell.state == CellStates.mover)
+            if (cell.state == this.CellRegistry.GetByType(MoverCell))
                 this.is_mover = true;
-            if (cell.state == CellStates.eye)
+            if (cell.state == this.CellRegistry.GetByType(EyeCell))
                 this.has_eyes = true;
         }
     }

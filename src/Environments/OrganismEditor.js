@@ -2,18 +2,18 @@ const Environment = require('./Environment');
 const Organism = require('../Organism/Organism');
 const GridMap = require('../Grid/GridMap');
 const Renderer = require('../Rendering/Renderer');
-const CellStates = require('../Organism/Cell/CellStates');
 const EditorController = require("../Controllers/EditorController");
 const Species = require('../Stats/Species');
 
 class OrganismEditor extends Environment{
-    constructor() {
-        super();
+    constructor(registry) {
+        super(registry);
         this.is_active = true;
         var cell_size = 13;
         this.renderer = new Renderer('editor-canvas', 'editor-env', cell_size);
         this.controller = new EditorController(this, this.renderer.canvas);
-        this.grid_map = new GridMap(15, 15, cell_size);
+        this.Registry.Cells.Subscribe('register', (payload) => console.log(payload))
+        this.grid_map = new GridMap(this, this.Registry.Cells, 15, 15, cell_size);
         this.clear();
     }
 
@@ -59,14 +59,14 @@ class OrganismEditor extends Environment{
         var prev_cell = this.organism.anatomy.getLocalCell(loc_c, loc_r)
         if (prev_cell != null) {
             if (this.organism.anatomy.removeCell(loc_c, loc_r)) {
-                this.changeCell(c, r, CellStates.empty, null);
+                this.changeCell(c, r, this.Registry.Cells.GetByName('empty'), null);
                 this.organism.species = new Species(this.organism.anatomy, null, 0);
             }
         }
     }
 
     setOrganismToCopyOf(orig_org) {
-        this.grid_map.fillGrid(CellStates.empty);
+        this.grid_map.fillGrid(this.Registry.Cells.GetByName('empty'));
         var center = this.grid_map.getCenter();
         this.organism = new Organism(center[0], center[1], this, orig_org);
         this.organism.updateGrid();
@@ -80,10 +80,10 @@ class OrganismEditor extends Environment{
     }
 
     clear() {
-        this.grid_map.fillGrid(CellStates.empty);
+        this.grid_map.fillGrid(this.Registry.Cells.GetByName('empty'));
         var center = this.grid_map.getCenter();
         this.organism = new Organism(center[0], center[1], this, null);
-        this.organism.anatomy.addDefaultCell(CellStates.mouth, 0, 0);
+        this.organism.anatomy.addDefaultCell(this.Registry.Cells.GetByName('mouth'), 0, 0);
         this.organism.updateGrid();
         this.organism.species = new Species(this.organism.anatomy, null, 0);
     }

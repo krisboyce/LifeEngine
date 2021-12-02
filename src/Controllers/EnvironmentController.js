@@ -1,7 +1,6 @@
 const CanvasController = require("./CanvasController");
 const Organism = require('../Organism/Organism');
 const Modes = require("./ControlModes");
-const CellStates = require("../Organism/Cell/CellStates");
 const Neighbors = require("../Grid/Neighbors");
 const FossilRecord = require("../Stats/FossilRecord");
 const Hyperparams = require("../Hyperparameters");
@@ -92,19 +91,19 @@ class EnvironmentController extends CanvasController{
             switch(mode) {
                 case Modes.FoodDrop:
                     if (left_click){
-                        this.dropCellType(cell.col, cell.row, CellStates.food, false);
+                        this.dropCellType(cell.col, cell.row, this.env.Registry.GetState('food'), false);
                     }
                     else if (right_click){
-                        this.dropCellType(cell.col, cell.row, CellStates.empty, false);
+                        this.dropCellType(cell.col, cell.row, this.env.Registry.GetState('empty'), false);
                     }
                     break;
                 case Modes.WallDrop:
                         if (left_click){
-                            this.dropCellType(cell.col, cell.row, CellStates.wall, true);
+                            this.dropCellType(cell.col, cell.row, this.env.Registry.GetState('wall'), true);
 
                         }
                         else if (right_click){
-                            this.dropCellType(cell.col, cell.row, CellStates.empty, false);
+                            this.dropCellType(cell.col, cell.row, this.env.Registry.GetState('empty'), false);
                         }
                         break;
                 case Modes.ClickKill:

@@ -1,5 +1,4 @@
 // const CellTypes = require("../Organism/Cell/CellTypes");
-const CellStates = require("../Organism/Cell/CellStates");
 const Directions = require("../Organism/Directions");
 
 // Renderer controls access to a canvas. There is one renderer for each canvas

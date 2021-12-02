@@ -1,4 +1,3 @@
-const CellStates = require("../CellStates");
 const BodyCell = require("./BodyCell");
 const Hyperparams = require("../../../Hyperparameters");
 const Directions = require("../../Directions");
@@ -6,7 +5,7 @@ const Observation = require("../../Perception/Observation")
 
 class EyeCell extends BodyCell{
     constructor(org, loc_col, loc_row){
-        super(CellStates.eye, org, loc_col, loc_row);
+        super(org, loc_col, loc_row);
         this.org.anatomy.has_eyes = true;
     }
 
@@ -69,7 +68,7 @@ class EyeCell extends BodyCell{
             if (cell == null) {
                 break;
             }
-            if (cell.state != CellStates.empty){
+            if (cell.state != env.Registry.Cells.GetByName('empty')){
                 var distance = Math.abs(start_col-col) + Math.abs(start_row-row);
                 return new Observation(cell, distance, direction);
             }

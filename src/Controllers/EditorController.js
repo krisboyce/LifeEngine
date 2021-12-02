@@ -1,8 +1,8 @@
 const CanvasController = require("./CanvasController");
 const Modes = require("./ControlModes");
-const CellStates = require("../Organism/Cell/CellStates");
 const Directions = require("../Organism/Directions");
 const Hyperparams = require("../Hyperparameters");
+const { Eye } = require("../Organism/Cell/BodyCells/BodyCells");
 
 class EditorController extends CanvasController{
     constructor(env, canvas) {
@@ -34,7 +34,7 @@ class EditorController extends CanvasController{
         if (this.edit_cell_type == null || this.mode != Modes.Edit)
             return;
         if (this.left_click){
-            if(this.edit_cell_type == CellStates.eye && this.cur_cell.state == CellStates.eye) {
+            if(this.edit_cell_type == this.env.Registry.Cells.GetByType(Eye) && this.cur_cell.state == this.env.Registry.Cells.GetByType(Eye)) {
                 var loc_cell = this.getCurLocalCell();
                 loc_cell.direction = Directions.rotateRight(loc_cell.direction);
                 this.env.renderFull();
@@ -58,26 +58,11 @@ class EditorController extends CanvasController{
     defineCellTypeSelection() {
         var self = this;
         $('.cell-type').click( function() {
-            switch(this.id){
-                case "mouth":
-                    self.edit_cell_type = CellStates.mouth;
-                    break;
-                case "producer":
-                    self.edit_cell_type = CellStates.producer;
-                    break;
-                case "mover":
-                    self.edit_cell_type = CellStates.mover;
-                    break;
-                case "killer":
-                    self.edit_cell_type = CellStates.killer;
-                    break;
-                case "armor":
-                    self.edit_cell_type = CellStates.armor;
-                    break;
-                case "eye":
-                    self.edit_cell_type = CellStates.eye;
-                    break;
+            let state = this.env.Registry.GetState(id);
+            if(state){
+                self.edit_cell_type = state;
             }
+
             $(".cell-type" ).css( "border-color", "black" );
             var selected = '#'+this.id+'.cell-type';
             $(selected).css("border-color", "yellow");

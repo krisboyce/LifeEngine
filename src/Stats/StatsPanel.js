@@ -10,14 +10,14 @@ const ChartSelections = [PopulationChart, SpeciesChart, CellsChart, MutationChar
 class StatsPanel {
     constructor(env) {
         this.defineControls();
+        this.env = env;
         this.chart_selection = 0;
         this.setChart();
-        this.env = env;
         this.last_reset_count=env.reset_count;
     }
 
     setChart(selection=this.chart_selection) {
-        this.chart_controller = new ChartSelections[selection]();
+        this.chart_controller = new ChartSelections[selection](this.env.Registry);
         this.chart_controller.setData();
         this.chart_controller.render();
     }

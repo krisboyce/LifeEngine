@@ -1,7 +1,8 @@
 
 //An evironment has a grid_map, controller, and renderer
 class Environment{
-    constructor() {
+    constructor(registry) {
+        this.Registry = registry;
     }
 
     update(){

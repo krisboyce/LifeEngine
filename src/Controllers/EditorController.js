@@ -57,8 +57,19 @@ class EditorController extends CanvasController{
 
     defineCellTypeSelection() {
         var self = this;
+        const cells = this.env.Registry.Cells.WithTag('living');
+        for (let i = 5; i > 0; i--) {
+            $('#cell-selections').prepend(`<div style='grid-column: ${i};'>`)
+        }
+        for (let i = 0; i < cells.length; i++) {
+            const cell = cells[i];
+            const col = Math.floor(i / 4);
+            console.log(col, $('#cell-selections > div')[col]);
+            const colEl = $('#cell-selections > div')[col];
+            $(colEl).append(`<div class='cell-type' id='${cell.name}' title="${cell.description}"></div>`)
+        }
         $('.cell-type').click( function() {
-            let state = this.env.Registry.GetState(id);
+            let state = self.env.Registry.Cells.GetByName(this.id);
             if(state){
                 self.edit_cell_type = state;
             }

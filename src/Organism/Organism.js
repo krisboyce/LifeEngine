@@ -9,8 +9,8 @@ class Organism {
     constructor(col, row, env, parent=null) {
         this.c = col;
         this.r = row;
-        this.env = env;
-        this.CellRegistry = env.Registry.Cells;
+        this.env = env || parent.env;
+        this.CellRegistry = this.env.Registry.Cells;
         this.lifetime = 0;
         this.food_collected = 0;
         this.living = true;

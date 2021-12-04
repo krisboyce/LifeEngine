@@ -20,7 +20,7 @@ class Brain {
 
         // corresponds to CellTypes
         this.decisions = [];
-        const names = owner.env.Register.Cells.All().map(x => x.name).forEach(name => {
+        const names = owner.env.Registry.Cells.All().map(x => x.name).forEach(name => {
             this.decisions[name] = Decision.neutral;
         });
 

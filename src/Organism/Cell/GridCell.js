@@ -1,20 +1,20 @@
-const Hyperparams = require("../../Hyperparameters");
-
+import { Cells } from '../../Registry'
 // A cell exists in a grid map.
-class Cell{
-    constructor(state, col, row, x, y){
+class GridCell{
+    constructor(type, col, row, x, y){
         this.owner = null; // owner organism
         this.cell_owner = null; // owner cell of ^that organism
-        this.setType(state);
+        this.setType(type);
         this.col = col;
         this.row = row;
         this.x = x;
         this.y = y;
     }
 
-    setType(state) {
-        this.state = state;
+    setType(type) {
+        if(!Cells.All().find(x => x == type)) throw new Error(`Invalid type:${type.name} (${type})`);
+        this.type = type;
     }
 }
 
-module.exports = Cell;
+export default GridCell;

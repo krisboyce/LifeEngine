@@ -1,3 +1,4 @@
+const { Cells } = require("../../../Registry");
 
 const BodyCellFactory = {
     init: function(CellRegistry) {
@@ -5,25 +6,20 @@ const BodyCellFactory = {
     },
 
     createInherited: function (org, to_copy) {
-        var type = this.CellRegistry.GetByName(to_copy.state.name).CellType;
+        var type = to_copy.getType();
         var cell = new type(org, to_copy.loc_col, to_copy.loc_row);
-        cell.state = to_copy.state;
         cell.initInherit(to_copy);
         return cell;
     },
 
-    createRandom: function (org, state, loc_col, loc_row) {
-        var type = this.CellRegistry.GetByName(state.name).CellType;
+    createRandom: function (org, type, loc_col, loc_row) {
         var cell = new type(org, loc_col, loc_row);
-        cell.state = state;
         cell.initRandom();
         return cell;
     },
 
-    createDefault: function (org, state, loc_col, loc_row) {
-        var type = this.CellRegistry.GetByName(state.name).CellType;
+    createDefault: function (org, type, loc_col, loc_row) {
         var cell = new type(org, loc_col, loc_row);
-        cell.state = state;
         cell.initDefault();
         return cell;
     },

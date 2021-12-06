@@ -1,7 +1,10 @@
-const Hyperparams = require("../../../Hyperparameters");
-const BodyCell = require("./BodyCell");
+import HyperParameters from "../../../Hyperparameters";
+import { BodyCellState } from "../CellState";
+import BodyCell from "./BodyCell";
 
 class ChloroCell extends BodyCell{
+    static state = new BodyCellState(ChloroCell, "chloro", "", "");
+
     constructor(org, loc_col, loc_row){
         super(org, loc_col, loc_row);
     }
@@ -10,7 +13,7 @@ class ChloroCell extends BodyCell{
         var env = this.org.env;
         var real_c = this.getRealCol();
         var real_r = this.getRealRow();
-        for (var loc of Hyperparams.breathableNeighbors){
+        for (var loc of HyperParameters.breathableNeighbors){
             var cell = env.grid_map.cellAt(real_c+loc[0], real_r+loc[1]);
             this.synthesize(cell, env);
         }
@@ -24,4 +27,4 @@ class ChloroCell extends BodyCell{
     }
 }
 
-module.exports = ChloroCell;
+export default ChloroCell;

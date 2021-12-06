@@ -1,6 +1,6 @@
-const Hyperparams = require("../Hyperparameters");
-const Modes = require("./ControlModes");
-const StatsPanel = require("../Stats/StatsPanel");
+import HyperParameters from "../Hyperparameters";
+import { FoodDrop, WallDrop, ClickKill, Select, Edit, Clone, Drag } from "./ControlModes";
+import StatsPanel from "../Stats/StatsPanel";
 
 class ControlPanel {
     constructor(engine) {
@@ -98,14 +98,14 @@ class ControlPanel {
         $('.headless').click(function() {
             $('.headless').find("i").toggleClass("fa fa-eye");
             $('.headless').find("i").toggleClass("fa fa-eye-slash");
-            if (Hyperparams.headless){
+            if (HyperParameters.headless){
                 $('#headless-notification').css('display', 'none');
                 this.engine.env.renderFull();
             }
             else {
                 $('#headless-notification').css('display', 'block');
             }
-            Hyperparams.headless = !Hyperparams.headless;
+            HyperParameters.headless = !HyperParameters.headless;
         }.bind(this));
     }
 
@@ -152,26 +152,26 @@ class ControlPanel {
 
     defineHyperparameterControls() {
         $('#food-prod-prob').change(function() {
-            Hyperparams.foodProdProb = $('#food-prod-prob').val();
+            HyperParameters.foodProdProb = $('#food-prod-prob').val();
         }.bind(this));
         $('#lifespan-multiplier').change(function() {
-            Hyperparams.lifespanMultiplier = $('#lifespan-multiplier').val();
+            HyperParameters.lifespanMultiplier = $('#lifespan-multiplier').val();
         }.bind(this));
 
         $('#mover-rot').change(function() {
-            Hyperparams.moversCanRotate = this.checked;
+            HyperParameters.moversCanRotate = this.checked;
         });
         $('#offspring-rot').change(function() {
-            Hyperparams.offspringRotate = this.checked;
+            HyperParameters.offspringRotate = this.checked;
         });
         $('#insta-kill').change(function() {
-            Hyperparams.instaKill = this.checked;
+            HyperParameters.instaKill = this.checked;
         });
         $('#look-range').change(function() {
-            Hyperparams.lookRange = $('#look-range').val();
+            HyperParameters.lookRange = $('#look-range').val();
         });
         $('#food-drop-rate').change(function() {
-            Hyperparams.foodDropProb = $('#food-drop-rate').val();
+            HyperParameters.foodDropProb = $('#food-drop-rate').val();
         });
 
         $('#evolved-mutation').change( function() {
@@ -183,53 +183,53 @@ class ControlPanel {
                 $('.global-mutation-in').css('display', 'block');
                 $('#avg-mut').css('display', 'none');
             }
-            Hyperparams.useGlobalMutability = !this.checked;
+            HyperParameters.useGlobalMutability = !this.checked;
         });
         $('#global-mutation').change( function() {
-            Hyperparams.globalMutability = parseInt($('#global-mutation').val());
+            HyperParameters.globalMutability = parseInt($('#global-mutation').val());
         });
         $('.mut-prob').change( function() {
             switch(this.id){
                 case "add-prob":
-                    Hyperparams.addProb = this.value;
-                    Hyperparams.balanceMutationProbs(1);
+                    HyperParameters.addProb = this.value;
+                    HyperParameters.balanceMutationProbs(1);
                     break;
                 case "change-prob":
-                    Hyperparams.changeProb = this.value;
-                    Hyperparams.balanceMutationProbs(2);
+                    HyperParameters.changeProb = this.value;
+                    HyperParameters.balanceMutationProbs(2);
                     break;
                 case "remove-prob":
-                    Hyperparams.removeProb = this.value;
-                    Hyperparams.balanceMutationProbs(3);
+                    HyperParameters.removeProb = this.value;
+                    HyperParameters.balanceMutationProbs(3);
                     break;
             }
-            $('#add-prob').val(Math.floor(Hyperparams.addProb));
-            $('#change-prob').val(Math.floor(Hyperparams.changeProb));
-            $('#remove-prob').val(Math.floor(Hyperparams.removeProb));
+            $('#add-prob').val(Math.floor(HyperParameters.addProb));
+            $('#change-prob').val(Math.floor(HyperParameters.changeProb));
+            $('#remove-prob').val(Math.floor(HyperParameters.removeProb));
         });
         $('#movers-produce').change( function() {
-            Hyperparams.moversCanProduce = this.checked;
+            HyperParameters.moversCanProduce = this.checked;
         });
         $('#food-blocks').change( function() {
-            Hyperparams.foodBlocksReproduction = this.checked;        
+            HyperParameters.foodBlocksReproduction = this.checked;        
         });
         $('#reset-rules').click( function() {
-            Hyperparams.setDefaults();
-            $('#food-prod-prob').val(Hyperparams.foodProdProb);
-            $('#lifespan-multiplier').val(Hyperparams.lifespanMultiplier);
-            $('#mover-rot').prop('checked', Hyperparams.moversCanRotate);
-            $('#offspring-rot').prop('checked', Hyperparams.offspringRotate);
-            $('#insta-kill').prop('checked', Hyperparams.instaKill);
-            $('#evolved-mutation').prop('checked', !Hyperparams.useGlobalMutability);
-            $('#add-prob').val(Hyperparams.addProb);
-            $('#change-prob').val(Hyperparams.changeProb);
-            $('#remove-prob').val(Hyperparams.removeProb);
-            $('#movers-produce').prop('checked', Hyperparams.moversCanProduce);
-            $('#food-blocks').prop('checked', Hyperparams.foodBlocksReproduction);
-            $('#food-drop-rate').val(Hyperparams.foodDropProb);
-            $('#look-range').val(Hyperparams.lookRange);
+            HyperParameters.setDefaults();
+            $('#food-prod-prob').val(HyperParameters.foodProdProb);
+            $('#lifespan-multiplier').val(HyperParameters.lifespanMultiplier);
+            $('#mover-rot').prop('checked', HyperParameters.moversCanRotate);
+            $('#offspring-rot').prop('checked', HyperParameters.offspringRotate);
+            $('#insta-kill').prop('checked', HyperParameters.instaKill);
+            $('#evolved-mutation').prop('checked', !HyperParameters.useGlobalMutability);
+            $('#add-prob').val(HyperParameters.addProb);
+            $('#change-prob').val(HyperParameters.changeProb);
+            $('#remove-prob').val(HyperParameters.removeProb);
+            $('#movers-produce').prop('checked', HyperParameters.moversCanProduce);
+            $('#food-blocks').prop('checked', HyperParameters.foodBlocksReproduction);
+            $('#food-drop-rate').val(HyperParameters.foodDropProb);
+            $('#look-range').val(HyperParameters.lookRange);
 
-            if (!Hyperparams.useGlobalMutability) {
+            if (!HyperParameters.useGlobalMutability) {
                 $('.global-mutation-in').css('display', 'none');
                 $('#avg-mut').css('display', 'block');
             }
@@ -248,30 +248,30 @@ class ControlPanel {
             self.editor_controller.setDetailsPanel();
             switch(this.id) {
                 case "food-drop":
-                    self.setMode(Modes.FoodDrop);
+                    self.setMode(FoodDrop);
                     break;
                 case "wall-drop":
-                    self.setMode(Modes.WallDrop);
+                    self.setMode(WallDrop);
                     break;
                 case "click-kill":
-                    self.setMode(Modes.ClickKill);
+                    self.setMode(ClickKill);
                     break;
                 case "select":
-                    self.setMode(Modes.Select);
+                    self.setMode(Select);
                     break;
                 case "edit":
-                    self.setMode(Modes.Edit);
+                    self.setMode(Edit);
                     self.editor_controller.setEditorPanel();
                     break;
                 case "drop-org":
-                    self.setMode(Modes.Clone);
+                    self.setMode(Clone);
                     self.env_controller.org_to_clone = self.engine.organism_editor.getCopyOfOrg();
                     self.env_controller.add_new_species = self.editor_controller.new_species;
                     self.editor_controller.new_species = false;
                     // console.log(self.env_controller.add_new_species)
                     break;
                 case "drag-view":
-                    self.setMode(Modes.Drag);
+                    self.setMode(Drag);
             }
             $('.edit-mode-btn').css('background-color', '#9099c2');
             $('#'+this.id).css('background-color', '#81d2c7');
@@ -344,7 +344,7 @@ class ControlPanel {
         $('#fps-actual').text("Actual FPS: " + Math.floor(this.engine.actual_fps));
         $('#reset-count').text("Auto reset count: " + this.engine.env.reset_count);
         this.stats_panel.updateDetails();
-        if (Hyperparams.headless)
+        if (HyperParameters.headless)
             this.updateHeadlessIcon(delta_time);
 
     }
@@ -352,4 +352,4 @@ class ControlPanel {
 }
 
 
-module.exports = ControlPanel;
+export default ControlPanel;

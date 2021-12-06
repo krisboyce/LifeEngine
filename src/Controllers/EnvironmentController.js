@@ -1,14 +1,15 @@
-const CanvasController = require("./CanvasController");
-const Organism = require('../Organism/Organism');
-const Modes = require("./ControlModes");
-const Neighbors = require("../Grid/Neighbors");
-const FossilRecord = require("../Stats/FossilRecord");
-const Hyperparams = require("../Hyperparameters");
+import CanvasController from "./CanvasController";
+import Organism from '../Organism/Organism';
+import { Drag, None, FoodDrop, WallDrop, ClickKill, Select, Clone } from "./ControlModes";
+import { allSelf, all } from "../Grid/Neighbors";
+import FossilRecord from "../Stats/FossilRecord";
+import HyperParameters from "../Hyperparameters";
+import { Empty, Food, Wall } from "../Organism/Cell/EnvironmentCells/EnvironmentCells";
 
-class EnvironmentController extends CanvasController{
+export default class EnvironmentController extends CanvasController{
     constructor(env, canvas) {
         super(env, canvas);
-        this.mode = Modes.Drag;
+        this.mode = Drag;
         this.org_to_clone = null;
         this.add_new_species = false;
         this.defineZoomControls();
@@ -78,39 +79,39 @@ class EnvironmentController extends CanvasController{
     }
 
     performModeAction() {
-        if (Hyperparams.headless)
+        if (HyperParameters.headless)
             return;
         var mode = this.mode;
         var right_click = this.right_click;
         var left_click = this.left_click;
-        if (mode != Modes.None && (right_click || left_click)) {
+        if (mode != None && (right_click || left_click)) {
             var cell = this.cur_cell;
             if (cell == null){
                 return;
             }
             switch(mode) {
-                case Modes.FoodDrop:
+                case FoodDrop:
                     if (left_click){
-                        this.dropCellType(cell.col, cell.row, this.env.Registry.GetState('food'), false);
+                        this.dropCellType(cell.col, cell.row, Food, false);
                     }
                     else if (right_click){
-                        this.dropCellType(cell.col, cell.row, this.env.Registry.GetState('empty'), false);
+                        this.dropCellType(cell.col, cell.row, Empty, false);
                     }
                     break;
-                case Modes.WallDrop:
+                case WallDrop:
                         if (left_click){
-                            this.dropCellType(cell.col, cell.row, this.env.Registry.GetState('wall'), true);
+                            this.dropCellType(cell.col, cell.row, Wall, true);
 
                         }
                         else if (right_click){
-                            this.dropCellType(cell.col, cell.row, this.env.Registry.GetState('empty'), false);
+                            this.dropCellType(cell.col, cell.row, Empty, false);
                         }
                         break;
-                case Modes.ClickKill:
+                case ClickKill:
                     this.killNearOrganisms();
                     break;
 
-                case Modes.Select:
+                case Select:
                     if (this.cur_org == null) {
                         this.cur_org = this.findNearOrganism();
                     }
@@ -119,7 +120,7 @@ class EnvironmentController extends CanvasController{
                     }
                     break;
 
-                case Modes.Clone:
+                case Clone:
                     if (this.org_to_clone != null){
                         var new_org = new Organism(this.mouse_c, this.mouse_r, this.env, this.org_to_clone);
                         if (this.add_new_species){
@@ -138,7 +139,7 @@ class EnvironmentController extends CanvasController{
                         }
                     }
                     break;
-                case Modes.Drag:
+                case Drag:
                     var cur_top = parseInt($('#env-canvas').css('top'), 10);
                     var cur_left = parseInt($('#env-canvas').css('left'), 10);
                     var new_top = cur_top + ((this.mouse_y - this.start_y)*this.scale);
@@ -150,8 +151,8 @@ class EnvironmentController extends CanvasController{
         }
     }
 
-    dropCellType(col, row, state, killBlocking=false) {
-        for (var loc of Neighbors.allSelf){
+    dropCellType(col, row, type, killBlocking=false) {
+        for (var loc of allSelf){
             var c=col + loc[0];
             var r=row + loc[1];
             var cell = this.env.grid_map.cellAt(c, r);
@@ -163,12 +164,12 @@ class EnvironmentController extends CanvasController{
             else if (cell.owner != null) {
                 continue;
             }
-            this.env.changeCell(c, r, state, null);
+            this.env.changeCell(c, r, type, null);
         }
     }
 
     findNearOrganism() {
-        for (var loc of Neighbors.all){
+        for (var loc of all){
             var c = this.cur_cell.col + loc[0];
             var r = this.cur_cell.row + loc[1];
             var cell = this.env.grid_map.cellAt(c, r);
@@ -179,7 +180,7 @@ class EnvironmentController extends CanvasController{
     }
 
     killNearOrganisms() {
-        for (var loc of Neighbors.allSelf){
+        for (var loc of allSelf){
             var c = this.cur_cell.col + loc[0];
             var r = this.cur_cell.row + loc[1];
             var cell = this.env.grid_map.cellAt(c, r);
@@ -190,5 +191,3 @@ class EnvironmentController extends CanvasController{
 
 
 }
-
-module.exports = EnvironmentController;

@@ -1,20 +1,17 @@
-const Directions = require("../../Directions");
+import { up, down, left, right } from "../../Directions";
+import Cell from "../Cell";
 
 // A body cell defines the relative location of the cell in it's parent organism. It also defines their functional behavior.
-class BodyCell{
+class BodyCell extends Cell {
     constructor(org, loc_col, loc_row){
+        super();
         this.org = org;
         this.loc_col = loc_col;
         this.loc_row = loc_row;
-
         var distance = Math.max(Math.abs(loc_row)*2 + 2, Math.abs(loc_col)*2 + 2);
         if (this.org.anatomy.birth_distance < distance) {
             this.org.anatomy.birth_distance = distance;
         }
-    }
-
-    setState(state) {
-        this.state = state;
     }
 
     initInherit(parent) {
@@ -52,31 +49,34 @@ class BodyCell{
 
     rotatedCol(dir){
         switch(dir){
-            case Directions.up:
+            case up:
                 return this.loc_col;
-            case Directions.down:
+            case down:
                 return this.loc_col * -1;
-            case Directions.left:
+            case left:
                 return this.loc_row;
-            case Directions.right:
+            case right:
                 return this.loc_row * -1;
         }
     }
 
     rotatedRow(dir){
         switch(dir){
-            case Directions.up:
+            case up:
                 return this.loc_row;
-            case Directions.down:
+            case down:
                 return this.loc_row * -1;
-            case Directions.left:
+            case left:
                 return this.loc_col * -1;
-            case Directions.right:
+            case right:
                 return this.loc_col;
         }
     }
 
-    
+    render(ctx, cell, size) {
+        ctx.fillStyle = color;
+        ctx.fillRect(cell.x, cell.y, size, size);
+    }
 }
 
-module.exports = BodyCell;
+export default BodyCell;

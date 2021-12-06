@@ -1,10 +1,13 @@
-const BodyCell = require("./BodyCell");
+import { BodyCellState } from "../CellState";
+import BodyCell from "./BodyCell";
 
 class MoverCell extends BodyCell{
+    static state = new BodyCellState(MoverCell, "mover", "", "");
+
     constructor(org, loc_col, loc_row){
         super(org, loc_col, loc_row);
         this.org.anatomy.is_mover = true;
     }
 }
 
-module.exports = MoverCell;
+export default MoverCell;

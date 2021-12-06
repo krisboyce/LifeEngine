@@ -1,17 +1,16 @@
-const Neighbors = require("./Grid/Neighbors");
+import { adjacent, all } from "./Grid/Neighbors";
 
-const Hyperparams = {
+const HyperParameters = {
     setDefaults: function() {
         this.headless = false;
-
+    
         this.lifespanMultiplier = 100;
         this.foodProdProb = 4;
         this.foodProdProbScalar = 4;
-        this.killableNeighbors = Neighbors.adjacent;
-        this.edibleNeighbors = Neighbors.adjacent;
-        this.growableNeighbors = Neighbors.adjacent;
-        this.breathableNeighbors = Neighbors.all;
-
+        this.killableNeighbors = adjacent;
+        this.edibleNeighbors = adjacent;
+        this.growableNeighbors = adjacent;
+    
         this.useGlobalMutability = false;
         this.globalMutability = 5;
         this.addProb = 33;
@@ -20,18 +19,17 @@ const Hyperparams = {
         
         this.moversCanRotate = true;
         this.offspringRotate = true;
-
+    
         this.foodBlocksReproduction = true;
         this.moversCanProduce = false;
-
+    
         this.instaKill = false;
-
+    
         this.lookRange = 20;
-
+    
         this.foodDropProb = 0;
     },
-
-    balanceMutationProbs : function(choice) {
+    balanceMutationProbs: function(choice) {
         if (choice == 1) {
             var remaining = 100 - this.addProb;
             this.changeProb = remaining/2;
@@ -50,6 +48,6 @@ const Hyperparams = {
     }
 }
 
-Hyperparams.setDefaults();
+HyperParameters.setDefaults();
 
-module.exports = Hyperparams;
+export default HyperParameters;

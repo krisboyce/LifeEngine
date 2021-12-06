@@ -11,3 +11,12 @@ export const Killer = KillerCell;
 export const Mouth = MouthCell;
 export const Mover = MoverCell;
 export const Producer = ProducerCell;
+
+export const BodyCells = [
+    Armor,
+    Eye,
+    Killer,
+    Mouth,
+    Mover,
+    Producer
+]

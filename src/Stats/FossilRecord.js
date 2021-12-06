@@ -1,6 +1,7 @@
-const Species = require("./Species");
+import { Cells } from "../Registry";
+import Species from "./Species";
 
-const FossilRecord = {
+export const FossilRecord = {
     init: function(){
         this.extant_species = [];
         this.extinct_species = [];
@@ -33,7 +34,7 @@ const FossilRecord = {
     fossilize: function(species) {
         // console.log("Extinction")
         species.end_tick = this.env.total_ticks;
-        for (i in this.extant_species) {
+        for (let i in this.extant_species) {
             var s = this.extant_species[i];
             if (s == species) {
                 this.extant_species.splice(i, 1);
@@ -51,7 +52,7 @@ const FossilRecord = {
     resurrect: function(species) {
         // console.log("Resurrecting species")
         if (species.extinct) {
-            for (i in this.extinct_species) {
+            for (let i in this.extinct_species) {
                 var s = this.extinct_species[i];
                 if (s == species) {
                     this.extinct_species.splice(i, 1);
@@ -61,8 +62,9 @@ const FossilRecord = {
             }
         }
     },
-
-    setData() {
+    tick_record: [0],
+    pop_counts: [0],
+    setData: function() {
         // all parallel arrays
         this.tick_record = [0];
         this.pop_counts = [0];
@@ -72,7 +74,7 @@ const FossilRecord = {
         this.av_cell_counts = [this.calcCellCountAverages()];
     },
 
-    updateData() {
+    updateData: function()  {
         var tick = this.env.total_ticks;
         this.tick_record.push(tick);
         this.pop_counts.push(this.env.organisms.length);
@@ -90,11 +92,11 @@ const FossilRecord = {
         }
     },
 
-    calcCellCountAverages() {
+    calcCellCountAverages: function() {
         var total_org = 0;
         var cell_counts = {};
-        for (let c of this.env.Registry.LivingStates()) {
-            cell_counts[c.name] = 0;
+        for (let c of Cells.WithTag('living')) {
+            cell_counts[c.state.name] = 0;
         }
         var first=true;
         for (let s of this.extant_species) {
@@ -119,14 +121,11 @@ const FossilRecord = {
         this.av_cell_counts.push(cell_counts);
     },
 
+    extant_species: [],
+    extinct_species: [],
     clear_record: function() {
-        this.extant_species = [];
-        this.extinct_species = [];
         this.setData();
     },
-
 }
 
-FossilRecord.init();
-
-module.exports = FossilRecord;
+export default FossilRecord;

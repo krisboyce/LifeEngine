@@ -1,13 +1,14 @@
-const CanvasController = require("./CanvasController");
-const Modes = require("./ControlModes");
-const Directions = require("../Organism/Directions");
-const Hyperparams = require("../Hyperparameters");
-const { Eye } = require("../Organism/Cell/BodyCells/BodyCells");
+import CanvasController from "./CanvasController";
+import { None, Edit } from "./ControlModes";
+import { rotateRight } from "../Organism/Directions";
+import HyperParameters from "../Hyperparameters";
+import { Eye } from "../Organism/Cell/BodyCells/BodyCells";
+import { Cells } from "../Registry";
 
-class EditorController extends CanvasController{
+export default class EditorController extends CanvasController{
     constructor(env, canvas) {
         super(env, canvas);
-        this.mode = Modes.None;
+        this.mode = None;
         this.edit_cell_type = null;
         this.highlight_org = false;
         this.new_species = false;
@@ -31,12 +32,12 @@ class EditorController extends CanvasController{
     }
 
     editOrganism() {
-        if (this.edit_cell_type == null || this.mode != Modes.Edit)
+        if (this.edit_cell_type == null || this.mode != Edit)
             return;
         if (this.left_click){
-            if(this.edit_cell_type == this.env.Registry.Cells.GetByType(Eye) && this.cur_cell.state == this.env.Registry.Cells.GetByType(Eye)) {
+            if(this.edit_cell_type == Eye && this.cur_cell.getType() == Eye) {
                 var loc_cell = this.getCurLocalCell();
-                loc_cell.direction = Directions.rotateRight(loc_cell.direction);
+                loc_cell.direction = rotateRight(loc_cell.direction);
                 this.env.renderFull();
             }
             else
@@ -57,21 +58,22 @@ class EditorController extends CanvasController{
 
     defineCellTypeSelection() {
         var self = this;
-        const cells = this.env.Registry.Cells.WithTag('living');
+        const cells = Cells.WithTag('living');
         for (let i = 5; i > 0; i--) {
             $('#cell-selections').prepend(`<div style='grid-column: ${i};'>`)
         }
-        for (let i = 0; i < cells.length; i++) {
-            const cell = cells[i];
+        for (let i = cells.length-1; i >=0 ; i--) {
+            const cell = cells[i].state;
             const col = Math.floor(i / 4);
-            console.log(col, $('#cell-selections > div')[col]);
             const colEl = $('#cell-selections > div')[col];
             $(colEl).append(`<div class='cell-type' id='${cell.name}' title="${cell.description}"></div>`)
+            $('#'+cell.name+'.cell-type ').css('background-color', cell.color);
+            $('#'+cell.name+'.cell-legend-type').css('background-color', cell.color);
         }
         $('.cell-type').click( function() {
-            let state = self.env.Registry.Cells.GetByName(this.id);
-            if(state){
-                self.edit_cell_type = state;
+            let type = Cells.GetByName(this.id);
+            if(type){
+                self.edit_cell_type = type;
             }
 
             $(".cell-type" ).css( "border-color", "black" );
@@ -113,7 +115,7 @@ class EditorController extends CanvasController{
         $('.cell-count').text("Cell count: "+org.anatomy.cells.length);
         $('#move-range').text("Move Range: "+org.move_range);
         $('#mutation-rate').text("Mutation Rate: "+org.mutability);
-        if (Hyperparams.useGlobalMutability) {
+        if (HyperParameters.useGlobalMutability) {
             $('#mutation-rate').css('display', 'none');
         }
         else {
@@ -190,5 +192,3 @@ class EditorController extends CanvasController{
         $('#reaction-edit').val(reaction);
     }
 }
-
-module.exports = EditorController;

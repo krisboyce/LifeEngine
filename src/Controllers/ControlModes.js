@@ -1,12 +1,9 @@
-const Modes = {
-    None: 0,
-    FoodDrop: 1,
-    WallDrop: 2,
-    ClickKill: 3,
-    Select: 4,
-    Edit: 5,
-    Clone: 6,
-    Drag: 7
-}
 
-module.exports = Modes;
+export const None = 0;
+export const FoodDrop = 1;
+export const WallDrop = 2;
+export const ClickKill = 3;
+export const Select = 4;
+export const Edit = 5;
+export const Clone = 6;
+export const Drag = 7;

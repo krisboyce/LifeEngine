@@ -1,52 +1,30 @@
-const WorldEnvironment = require('./Environments/WorldEnvironment');
-const ControlPanel = require('./Controllers/ControlPanel');
-const OrganismEditor = require('./Environments/OrganismEditor');
-const ColorScheme = require('./Rendering/ColorScheme');
-const Registry = require('./Registry');
-const BodyCellFactory = require('./Organism/Cell/BodyCells/BodyCellFactory');
-const { Mouth, Producer, Mover, Armor, Killer, Eye } = require('./Organism/Cell/BodyCells/BodyCells');
-const { BodyCellState } = require('./Organism/Cell/CellState');
+import WorldEnvironment from './Environments/WorldEnvironment';
+import ControlPanel from './Controllers/ControlPanel';
+import OrganismEditor from './Environments/OrganismEditor';
+import ColorScheme from './Rendering/ColorScheme';
+import { Cells, Registries } from './Registry';
+import { init } from './Organism/Cell/BodyCells/BodyCellFactory';
+import { BodyCells } from './Organism/Cell/BodyCells/BodyCells';
+import EmptyCell from './Organism/Cell/EnvironmentCells/EmptyCell';
+import WallCell from './Organism/Cell/EnvironmentCells/WallCell';
+import FoodCell from './Organism/Cell/EnvironmentCells/FoodCell';
 
 const render_speed = 60;
 
 class Engine {
     constructor(){
         this.fps = 60;
-        this.registry = new Registry();
-        this.registry.RegisterEnvironmentCell('empty', '#0E1318');
-        this.registry.RegisterEnvironmentCell('wall', 'gray');
-        this.registry.RegisterEnvironmentCell('food', '#2F7AB7');
-        this.registry.Cells.Register(
-            new BodyCellState(Mouth, 'mouth', '#DEB14D', 'Mouth: Eats adjacent food.', ['living']));
-        this.registry.Cells.Register(
-            new BodyCellState(Producer, 'producer', '#15DE59', 'Mouth: Eats adjacent food.', ['living']));
-        this.registry.Cells.Register(
-            new BodyCellState(Mover, 'mover', '#60D4FF', 'Mouth: Eats adjacent food.', ['living']));
-        this.registry.Cells.Register(
-            new BodyCellState(Armor, 'armor', '#7230DB', 'Mouth: Eats adjacent food.', ['living']));
-        this.registry.Cells.Register(
-            new BodyCellState(Killer, 'killer', '#F82380', 'Mouth: Eats adjacent food.', ['living']));
-        this.registry.Cells.Register(
-            new BodyCellState(Eye, 'eye', '#B6C1EA', 'Mouth: Eats adjacent food.', ['living']));
-        
-        // this.registry.RegisterBodyCell('eye', '#B6C1EA', Eye, (ctx, cell, size) => {
-        //     ctx.fillStyle = this.color;
-        //     ctx.fillRect(cell.x, cell.y, size, size);
-        //     if(size == 1)
-        //         return;
-        //     var half = size/2;
-        //     var x = -(size)/8
-        //     var y = -half;
-        //     var h = size/2 + size/4;
-        //     var w = size/4;
-        //     ctx.translate(cell.x+half, cell.y+half);
-        //     ctx.rotate((cell.cell_owner.getAbsoluteDirection() * 90) * Math.PI / 180);
-        //     ctx.fillStyle = this.slit_color;
-        //     ctx.fillRect(x, y, w, h);
-        //     ctx.setTransform(1, 0, 0, 1, 0, 0);
-        // });
 
-        BodyCellFactory.init(this.registry.Cells);
+        this.registry = Registries;
+        Cells.Register(EmptyCell);
+        Cells.Register(WallCell);
+        Cells.Register(FoodCell);
+        
+        BodyCells.forEach(x => {
+            Cells.Register(x)
+        });
+        
+        init(Cells);
         this.env = new WorldEnvironment(5, this.registry);
         this.organism_editor = new OrganismEditor(this.registry);
         this.controlpanel = new ControlPanel(this);
@@ -113,4 +91,4 @@ class Engine {
 
 }
 
-module.exports = Engine;
+export default Engine;

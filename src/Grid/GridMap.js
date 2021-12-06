@@ -1,9 +1,9 @@
-const Cell = require('../Organism/Cell/GridCell');
+import { Empty } from '../Organism/Cell/EnvironmentCells/EnvironmentCells';
+import GridCell from '../Organism/Cell/GridCell';
 
 class GridMap {
-    constructor(env, cells, cols, rows, cell_size) {
+    constructor(env, cols, rows, cell_size) {
         this.env = env;
-        this.Cells = cells;
         this.resize(cols, rows, cell_size);
     }
 
@@ -15,17 +15,17 @@ class GridMap {
         for(var c=0; c<cols; c++) {
             var row = [];
             for(var r=0; r<rows; r++) {
-                var cell = new Cell(this.Cells.GetByName('empty'), c, r, c*cell_size, r*cell_size);
+                var cell = new GridCell(Empty, c, r, c*cell_size, r*cell_size);
                 row.push(cell);
             }            
             this.grid.push(row);
         }
     }
 
-    fillGrid(state) {
+    fillGrid(type) {
         for (var col of this.grid) {
             for (var cell of col) {
-                cell.setType(state);
+                cell.setType(type);
                 cell.owner = null;
                 cell.cell_owner = null;
             }
@@ -39,12 +39,12 @@ class GridMap {
         return this.grid[col][row];
     }
 
-    setCellType(col, row, state) {
-        if (!state) throw new Error("State for cell must be defined.");
+    setCellType(col, row, type) {
+        if (!type) throw new Error("Type for cell must be defined.");
         if (!this.isValidLoc(col, row)) {
             return;
         }
-        this.grid[col][row].setType(state);
+        this.grid[col][row].setType(type);
     }
 
     setCellOwner(col, row, cell_owner) {
@@ -81,4 +81,4 @@ class GridMap {
     }
 }
 
-module.exports = GridMap;
+export default GridMap;

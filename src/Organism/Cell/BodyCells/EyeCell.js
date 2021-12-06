@@ -1,9 +1,28 @@
-const BodyCell = require("./BodyCell");
-const Hyperparams = require("../../../Hyperparameters");
-const Directions = require("../../Directions");
-const Observation = require("../../Perception/Observation")
+import BodyCell from "./BodyCell";
+import HyperParameters from "../../../Hyperparameters";
+import { getRandomDirection, up, down, right, left } from "../../Directions";
+import Observation from "../../Perception/Observation";
+import { BodyCellState } from "../CellState";
+import { Empty } from "../EnvironmentCells/EnvironmentCells";
 
 class EyeCell extends BodyCell{
+    static state = new BodyCellState(EyeCell, "eye", "", "", [], (ctx, cell, size) => {
+        ctx.fillStyle = this.color;
+        ctx.fillRect(cell.x, cell.y, size, size);
+        if(size == 1)
+            return;
+        var half = size/2;
+        var x = -(size)/8
+        var y = -half;
+        var h = size/2 + size/4;
+        var w = size/4;
+        ctx.translate(cell.x+half, cell.y+half);
+        ctx.rotate((cell.cell_owner.getAbsoluteDirection() * 90) * Math.PI / 180);
+        ctx.fillStyle = this.slit_color;
+        ctx.fillRect(x, y, w, h);
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+    });
+
     constructor(org, loc_col, loc_row){
         super(org, loc_col, loc_row);
         this.org.anatomy.has_eyes = true;
@@ -17,12 +36,12 @@ class EyeCell extends BodyCell{
     
     initRandom() {
         // initialize values randomly
-        this.direction = Directions.getRandomDirection();
+        this.direction = getRandomDirection();
     }
 
     initDefault() {
         // initialize to default values
-        this.direction = Directions.up;
+        this.direction = up;
     }
 
     getAbsoluteDirection() {
@@ -43,16 +62,16 @@ class EyeCell extends BodyCell{
         var addCol = 0;
         var addRow = 0;
         switch(direction) {
-            case Directions.up:
+            case up:
                 addRow = -1;
                 break;
-            case Directions.down:
+            case down:
                 addRow = 1;
                 break;
-            case Directions.right:
+            case right:
                 addCol = 1;
                 break;
-            case Directions.left:
+            case left:
                 addCol = -1;
                 break;
         }
@@ -61,20 +80,20 @@ class EyeCell extends BodyCell{
         var col = start_col;
         var row = start_row;
         var cell = null;
-        for (var i=0; i<Hyperparams.lookRange; i++){
+        for (var i=0; i<HyperParameters.lookRange; i++){
             col+=addCol;
             row+=addRow;
             cell = env.grid_map.cellAt(col, row);
             if (cell == null) {
                 break;
             }
-            if (cell.state != env.Registry.Cells.GetByName('empty')){
+            if (cell.type != Empty){
                 var distance = Math.abs(start_col-col) + Math.abs(start_row-row);
                 return new Observation(cell, distance, direction);
             }
         }
-        return new Observation(cell, Hyperparams.lookRange, direction);
+        return new Observation(cell, HyperParameters.lookRange, direction);
     }
 }
 
-module.exports = EyeCell;
+export default EyeCell;

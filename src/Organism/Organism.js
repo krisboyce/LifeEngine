@@ -1,23 +1,25 @@
-const Neighbors = require("../Grid/Neighbors");
-const Hyperparams = require("../Hyperparameters");
-const Directions = require("./Directions");
-const Anatomy = require("./Anatomy");
-const Brain = require("./Perception/Brain");
-const FossilRecord = require("../Stats/FossilRecord");
+import { all } from "../Grid/Neighbors";
+import HyperParameters from "../Hyperparameters";
+import * as Directions from "./Directions";
+import Anatomy from "./Anatomy";
+import Brain from "./Perception/Brain";
+import FossilRecord from "../Stats/FossilRecord";
+import { Armor } from "./Cell/BodyCells/BodyCells";
+import { Empty, Food } from "./Cell/EnvironmentCells/EnvironmentCells";
+import { Cells } from "../Registry";
 
 class Organism {
     constructor(col, row, env, parent=null) {
         this.c = col;
         this.r = row;
         this.env = env || parent.env;
-        this.CellRegistry = this.env.Registry.Cells;
         this.lifetime = 0;
         this.food_collected = 0;
         this.living = true;
         this.anatomy = new Anatomy(this)
         this.direction = Directions.down; // direction of movement
         this.rotation = Directions.up; // direction of rotation
-        this.can_rotate = Hyperparams.moversCanRotate;
+        this.can_rotate = HyperParameters.moversCanRotate;
         this.move_count = 0;
         this.move_range = 4;
         this.ignore_brain_for = 0;
@@ -52,7 +54,7 @@ class Organism {
 
     lifespan() {
         // console.log(Hyperparams.lifespanMultiplier)
-        return this.anatomy.cells.length * Hyperparams.lifespanMultiplier;
+        return this.anatomy.cells.length * HyperParameters.lifespanMultiplier;
     }
 
     maxHealth() {
@@ -63,12 +65,12 @@ class Organism {
         //produce mutated child
         //check nearby locations (is there room and a direct path)
         var org = new Organism(0, 0, this.env, this);
-        if(Hyperparams.offspringRotate){
+        if(HyperParameters.offspringRotate){
             org.rotation = Directions.getRandomDirection();
         }
         var prob = this.mutability;
-        if (Hyperparams.useGlobalMutability){
-            prob = Hyperparams.globalMutability;
+        if (HyperParameters.useGlobalMutability){
+            prob = HyperParameters.globalMutability;
         }
         else {
             //mutate the mutability
@@ -122,32 +124,33 @@ class Organism {
 
     }
 
+    getRandomLivingType() {
+        const living = Cells.WithTag('living');
+        return living[Math.floor(Math.random() * living.length)];
+    }
+
     mutate() {
         var choice = Math.floor(Math.random() * 100);
         var mutated = false;
-        if (choice <= Hyperparams.addProb) {
-            // add cell
-            // console.log("add cell")
-
+        if (choice <= HyperParameters.addProb) {
             var branch = this.anatomy.getRandomCell();
-            var state = this.env.Registry.getRandomLivingType();//branch.state;
-            var growth_direction = Neighbors.all[Math.floor(Math.random() * Neighbors.all.length)]
+            var type = this.getRandomLivingType();
+            var growth_direction = all[Math.floor(Math.random() * all.length)]
             var c = branch.loc_col+growth_direction[0];
             var r = branch.loc_row+growth_direction[1];
             if (this.anatomy.canAddCellAt(c, r)){
                 mutated = true;
-                this.anatomy.addRandomizedCell(state, c, r);
+                this.anatomy.addRandomizedCell(type, c, r);
             }
         }
-        else if (choice <= Hyperparams.addProb + Hyperparams.changeProb){
+        else if (choice <= HyperParameters.addProb + HyperParameters.changeProb){
             // change cell
             var cell = this.anatomy.getRandomCell();
-            var state = this.env.Registry.getRandomLivingType();
-            // console.log("change cell", state)
-            this.anatomy.replaceCell(state, cell.loc_col, cell.loc_row);
+            var type = this.getRandomLivingType();
+            this.anatomy.replaceCell(type, cell.loc_col, cell.loc_row);
             mutated = true;
         }
-        else if (choice <= Hyperparams.addProb + Hyperparams.changeProb + Hyperparams.removeProb){
+        else if (choice <= HyperParameters.addProb + HyperParameters.changeProb + HyperParameters.removeProb){
             // remove cell
             // console.log("remove cell")
 
@@ -169,7 +172,7 @@ class Organism {
             for (var cell of this.anatomy.cells) {
                 var real_c = this.c + cell.rotatedCol(this.rotation);
                 var real_r = this.r + cell.rotatedRow(this.rotation);
-                this.env.changeCell(real_c, real_r, this.CellRegistry.GetByName('empty'), null);
+                this.env.changeCell(real_c, real_r, Empty, null);
             }
             this.c = new_c;
             this.r = new_r;
@@ -190,7 +193,7 @@ class Organism {
             for (var cell of this.anatomy.cells) {
                 var real_c = this.c + cell.rotatedCol(this.rotation);
                 var real_r = this.r + cell.rotatedRow(this.rotation);
-                this.env.changeCell(real_c, real_r, this.CellRegistry.GetByName('empty'), null);
+                this.env.changeCell(real_c, real_r, Empty, null);
             }
             this.rotation = new_rotation;
             this.direction = Directions.getRandomDirection();
@@ -239,20 +242,17 @@ class Organism {
     }
 
     isPassableCell(cell, parent){
-        return cell != null && (cell.state == this.CellRegistry.GetByName('empty') || cell.owner == this || cell.owner == parent || cell.state == this.CellRegistry.GetByName('food'));
+        return cell != null && (cell.type == Empty || cell.owner == this || cell.owner == parent || cell.type == Food);
     }
 
     isClear(col, row, rotation=this.rotation, ignore_armor=false) {
         for(var loccell of this.anatomy.cells) {
-            var cell = this.getRealCell(loccell, col, row, rotation);
-            if (cell==null) {
+            var gridCell = this.getGridCell(loccell, col, row, rotation);
+            if (gridCell==null) {
                 return false;
             }
-            // console.log(cell.owner == this)
-            var emptyState = this.CellRegistry.GetByName('empty');
-            var foodState = this.CellRegistry.GetByName('food');
-            var armorState = this.CellRegistry.GetByName('armor');
-            if (cell.owner==this || cell.state==emptyState || (!Hyperparams.foodBlocksReproduction && cell.state==foodState) || (ignore_armor && loccell.state==armorState && cell.state==foodState)){
+
+            if (gridCell.owner==this || gridCell.type == Empty || (!HyperParameters.foodBlocksReproduction && gridCell.type==Food) || (ignore_armor && loccell.getType()==Armor && gridCell.type==Food)){
                 continue;
             }
             return false;
@@ -262,7 +262,7 @@ class Organism {
 
     harm() {
         this.damage++;
-        if (this.damage >= this.maxHealth() || Hyperparams.instaKill) {
+        if (this.damage >= this.maxHealth() || HyperParameters.instaKill) {
             this.die();
         }
     }
@@ -271,7 +271,7 @@ class Organism {
         for (var cell of this.anatomy.cells) {
             var real_c = this.c + cell.rotatedCol(this.rotation);
             var real_r = this.r + cell.rotatedRow(this.rotation);
-            this.env.changeCell(real_c, real_r, this.CellRegistry.GetByName('food'), null);
+            this.env.changeCell(real_c, real_r, Food, null);
         }
         this.species.decreasePop();
         this.living = false;
@@ -281,7 +281,7 @@ class Organism {
         for (var cell of this.anatomy.cells) {
             var real_c = this.c + cell.rotatedCol(this.rotation);
             var real_r = this.r + cell.rotatedRow(this.rotation);
-            this.env.changeCell(real_c, real_r, cell.state, cell);
+            this.env.changeCell(real_c, real_r, cell.getType(), cell);
         }
     }
 
@@ -323,7 +323,7 @@ class Organism {
         return this.living;
     }
 
-    getRealCell(local_cell, c=this.c, r=this.r, rotation=this.rotation){
+    getGridCell(local_cell, c=this.c, r=this.r, rotation=this.rotation){
         var real_c = c + local_cell.rotatedCol(rotation);
         var real_r = r + local_cell.rotatedRow(rotation);
         return this.env.grid_map.cellAt(real_c, real_r);
@@ -331,4 +331,4 @@ class Organism {
 
 }
 
-module.exports = Organism;
+export default Organism;

@@ -1,6 +1,5 @@
 
-
-class CanvasController{
+export default class CanvasController{
     constructor(env, canvas) {
         this.env = env;
         this.canvas = canvas;
@@ -92,5 +91,3 @@ class CanvasController{
         alert("mouse up must be overridden")
     }
 }
-
-module.exports = CanvasController;

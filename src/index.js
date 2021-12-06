@@ -1,4 +1,3 @@
-'use strict';
 
 import Engine from './Engine';
 

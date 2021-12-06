@@ -1,7 +1,11 @@
-const BodyCell = require("./BodyCell");
-const Hyperparams = require("../../../Hyperparameters");
+import BodyCell from "./BodyCell";
+import HyperParameters from "../../../Hyperparameters";
+import { BodyCellState } from "../CellState";
+import { Empty, Food } from "../EnvironmentCells/EnvironmentCells";
 
 class MouthCell extends BodyCell{
+    static state = new BodyCellState(MouthCell, "mouth", "", "");
+
     constructor(org, loc_col, loc_row){
         super(org, loc_col, loc_row);
     }
@@ -10,7 +14,7 @@ class MouthCell extends BodyCell{
         var env = this.org.env;
         var real_c = this.getRealCol();
         var real_r = this.getRealRow();
-        for (var loc of Hyperparams.edibleNeighbors){
+        for (var loc of HyperParameters.edibleNeighbors){
             var cell = env.grid_map.cellAt(real_c+loc[0], real_r+loc[1]);
             this.eatNeighbor(cell, env);
         }
@@ -19,11 +23,11 @@ class MouthCell extends BodyCell{
     eatNeighbor(n_cell, env) {
         if (n_cell == null)
             return;
-        if (n_cell.state == env.Registry.Cells.GetByName('food')){
-            env.changeCell(n_cell.col, n_cell.row, env.Registry.Cells.GetByName('empty'), null);
+        if (n_cell.type == Food){
+            env.changeCell(n_cell.col, n_cell.row, Empty, null);
             this.org.food_collected++;
         }
     }
 }
 
-module.exports = MouthCell;
+export default MouthCell;

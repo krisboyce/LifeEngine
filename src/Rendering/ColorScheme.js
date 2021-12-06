@@ -1,3 +1,4 @@
+const { Cells } = require("../Registry");
 
 var color_scheme = {
     "empty":"#0E1318",
@@ -21,8 +22,8 @@ class ColorScheme {
         this.color_scheme = color_scheme;
     }
     loadColorScheme() {
-        for (var state of this.world_env.Registry.Cells.All()) {
-            state.color = this.color_scheme[state.name];
+        for (var cell of Cells.All()) {
+            cell.state.color = this.color_scheme[cell.state.name];
         }
         //CellStates.eye.slit_color=color_scheme['eye-slit']
         for (var cell_type in color_scheme) {

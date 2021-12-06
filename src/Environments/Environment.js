@@ -9,8 +9,8 @@ class Environment{
         alert("Environment.update() must be overriden");
     }
 
-    changeCell(c, r, state, owner) {
-        this.grid_map.setCellType(c, r, state);
+    changeCell(c, r, type, owner) {
+        this.grid_map.setCellType(c, r, type);
         this.grid_map.setCellOwner(c, r, owner);
     }
 }

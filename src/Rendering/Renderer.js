@@ -1,5 +1,5 @@
 // const CellTypes = require("../Organism/Cell/CellTypes");
-const Directions = require("../Organism/Directions");
+import Directions from "../Organism/Directions";
 
 // Renderer controls access to a canvas. There is one renderer for each canvas
 class Renderer {
@@ -34,26 +34,26 @@ class Renderer {
     renderFullGrid(grid) {
         for (var col of grid) {
             for (var cell of col){
-                this.renderCell(cell);
+                this.renderGridCell(cell);
             }
         }
     }
 
     renderCells() {
         for (var cell of this.cells_to_render) {
-            this.renderCell(cell);
+            this.renderGridCell(cell);
         }
         this.cells_to_render.clear();
     }
 
-    renderCell(cell) {
-        cell.state.render(this.ctx, cell, this.cell_size);
+    renderGridCell(gridCell) {
+        gridCell.type.state.render(this.ctx, gridCell, this.cell_size);
     }
 
     renderOrganism(org) {
         for(var org_cell of org.anatomy.cells) {
             var cell = org.getRealCell(org_cell);
-            this.renderCell(cell);
+            this.renderGridCell(cell);
         }
     }
 
@@ -85,7 +85,7 @@ class Renderer {
     }
 
     renderCellHighlight(cell, color="yellow") {
-        this.renderCell(cell);
+        this.renderGridCell(cell);
         this.ctx.fillStyle = color;
         this.ctx.globalAlpha = 0.5;
         this.ctx.fillRect(cell.x, cell.y, this.cell_size, this.cell_size);
@@ -95,7 +95,7 @@ class Renderer {
 
     clearAllHighlights(clear_to_highlight=false) {
         for (var cell of this.highlighted_cells) {
-            this.renderCell(cell);
+            this.renderGridCell(cell);
         }
         this.highlighted_cells.clear();
         if (clear_to_highlight) {
@@ -108,4 +108,4 @@ class Renderer {
 //     console.log("hello");
 // });
 
-module.exports = Renderer;
+export default Renderer;

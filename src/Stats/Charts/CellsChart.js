@@ -1,5 +1,6 @@
-const FossilRecord = require("../FossilRecord");
-const ChartController = require("./ChartController");
+import { Cells } from "../../Registry";
+import FossilRecord from "../FossilRecord";
+import ChartController from "./ChartController";
 
 class CellsChart extends ChartController {
     constructor(registry) {
@@ -22,7 +23,7 @@ class CellsChart extends ChartController {
                 dataPoints: []
             }
         );
-        for (var c of this.registry.LivingStates()) {
+        for (var c of Cells.WithTag('living')) {
             this.data.push({
                 type: "line",
                 markerType: "none",
@@ -46,10 +47,14 @@ class CellsChart extends ChartController {
         var j=1;
         for (var name in FossilRecord.av_cell_counts[i]) {
             var count = FossilRecord.av_cell_counts[i][name];
+            try{
             this.data[j].dataPoints.push({x:t,y:count})
+            }catch(err){
+                console.log(err);
+            }
             j++;
         }
     }
 }
 
-module.exports = CellsChart;
+export default CellsChart;

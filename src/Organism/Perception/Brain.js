@@ -1,5 +1,6 @@
-const Hyperparams = require("../../Hyperparameters");
-const Directions = require("../Directions");
+import HyperParameters from "../../Hyperparameters";
+import { Cells } from "../../Registry";
+import { getOppositeDirection } from "../Directions";
 
 const Decision = {
     neutral: 0,
@@ -20,7 +21,7 @@ class Brain {
 
         // corresponds to CellTypes
         this.decisions = [];
-        const names = owner.env.Registry.Cells.All().map(x => x.name).forEach(name => {
+        const names = Cells.All().map(x => x.name).forEach(name => {
             this.decisions[name] = Decision.neutral;
         });
 
@@ -43,15 +44,14 @@ class Brain {
 
     decide() {
         var decision = Decision.neutral;
-        var closest = Hyperparams.lookRange + 1;
+        var closest = HyperParameters.lookRange + 1;
         var move_direction = 0;
         for (var obs of this.observations) {
             if (obs.cell == null || obs.cell.owner == this.owner) {
                 continue;
             }
             if (obs.distance < closest) {
-                // console.log(obs.cell.state)
-                decision = this.decisions[obs.cell.state.name];
+                decision = this.decisions[obs.cell.type.state.name];
                 // console.log(decision)
                 move_direction = obs.direction;
                 closest = obs.distance;
@@ -63,16 +63,21 @@ class Brain {
             return true;
         }
         else if (decision == Decision.retreat) {
-            this.owner.changeDirection(Directions.getOppositeDirection(move_direction));
+            this.owner.changeDirection(getOppositeDirection(move_direction));
             return true;
         }
         return false;
     }
+    
+    getRandomName() {
+        var names = Cells.All().map(x => x.name);
+        return names[Math.floor(Math.random() * names.length)];
+    }
 
     mutate() {
-        this.decisions[this.owner.env.Registry.getRandomName()] = Decision.getRandom();
+        this.decisions[this.getRandomName()] = Decision.getRandom();
         this.decisions['empty'] = Decision.neutral; // if the empty cell has a decision it gets weird
     }
 }
 
-module.exports = Brain;
+export default Brain;

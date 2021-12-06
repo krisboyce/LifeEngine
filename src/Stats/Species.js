@@ -1,3 +1,4 @@
+import { Cells } from "../Registry";
 
 class Species {
     constructor(anatomy, ancestor, start_tick) {
@@ -20,11 +21,11 @@ class Species {
 
     calcAnatomyDetails() {
         var cell_counts = {};
-        for (let c of this.anatomy.owner.env.Registry.Cells.WithTag('living')) {
+        for (let c of Cells.WithTag('living')) {
             cell_counts[c.name] = 0;
         }
         for (let cell of this.anatomy.cells) {
-            cell_counts[cell.state.name]+=1;
+            cell_counts[cell.getType().state.name]+=1;
         }
         this.cell_counts=cell_counts;
     }
@@ -38,7 +39,7 @@ class Species {
         this.population--;
         if (this.population <= 0) {
             this.extinct = true;
-            const FossilRecord = require("./FossilRecord");
+            const FossilRecord = require("./FossilRecord").default;
             FossilRecord.fossilize(this);
         }
     }
@@ -48,4 +49,4 @@ class Species {
     }
 }
 
-module.exports = Species;
+export default Species;

@@ -1,12 +1,9 @@
-const BodyCellFactory = require("./Cell/BodyCells/BodyCellFactory");
-const EyeCell = require("./Cell/BodyCells/EyeCell");
-const MoverCell = require("./Cell/BodyCells/MoverCell");
-const ProducerCell = require("./Cell/BodyCells/ProducerCell");
+import { createDefault, createRandom, createInherited } from "./Cell/BodyCells/BodyCellFactory";
+import { Eye, Mover, Producer } from "./Cell/BodyCells/BodyCells";
 
 class Anatomy {
     constructor(owner) {
         this.owner = owner;
-        this.CellRegistry = owner.env.Registry.Cells;
         this.cells = [];
         this.is_producer = false;
         this.is_mover = false;
@@ -23,34 +20,34 @@ class Anatomy {
         return true;
     }
 
-    addDefaultCell(state, c, r) {
-        var new_cell = BodyCellFactory.createDefault(this.owner, state, c, r);
+    addDefaultCell(type, c, r) {
+        var new_cell = createDefault(this.owner, type, c, r);
         this.cells.push(new_cell);
         return new_cell;
     }
 
-    addRandomizedCell(state, c, r) {
-        if (state==this.CellRegistry.GetByType(EyeCell) && !this.has_eyes) {
+    addRandomizedCell(type, c, r) {
+        if (type==Eye && !this.has_eyes) {
             this.owner.brain.randomizeDecisions();
         }
-        var new_cell = BodyCellFactory.createRandom(this.owner, state, c, r);
+        var new_cell = createRandom(this.owner, type, c, r);
         this.cells.push(new_cell);
         return new_cell;
     }
 
     addInheritCell(parent_cell) {
-        var new_cell = BodyCellFactory.createInherited(this.owner, parent_cell);
+        var new_cell = createInherited(this.owner, parent_cell);
         this.cells.push(new_cell);
         return new_cell;
     }
 
-    replaceCell(state, c, r, randomize=true) {
+    replaceCell(type, c, r, randomize=true) {
         this.removeCell(c, r, true);
         if (randomize) {
-            return this.addRandomizedCell(state, c, r);
+            return this.addRandomizedCell(type, c, r);
         }
         else {
-            return this.addDefaultCell(state, c, r);
+            return this.addDefaultCell(type, c, r);
         }
     }
 
@@ -64,7 +61,7 @@ class Anatomy {
                 break;
             }
         }
-        this.checkTypeChange(cell.state);
+        this.checkTypeChange(cell.getType());
         return true;
     }
 
@@ -82,11 +79,11 @@ class Anatomy {
         this.is_mover = false;
         this.has_eyes = false;
         for (var cell of this.cells) {
-            if (cell.state == this.CellRegistry.GetByType(ProducerCell))
+            if (cell.getType() == Producer)
                 this.is_producer = true;
-            if (cell.state == this.CellRegistry.GetByType(MoverCell))
+            if (cell.getType() == Mover)
                 this.is_mover = true;
-            if (cell.state == this.CellRegistry.GetByType(EyeCell))
+            if (cell.getType() == Eye)
                 this.has_eyes = true;
         }
     }
@@ -96,4 +93,4 @@ class Anatomy {
     }
 }
 
-module.exports = Anatomy;
+export default Anatomy;

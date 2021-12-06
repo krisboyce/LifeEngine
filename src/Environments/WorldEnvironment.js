@@ -1,10 +1,12 @@
-const Environment = require('./Environment');
-const Renderer = require('../Rendering/Renderer');
-const GridMap = require('../Grid/GridMap');
-const Organism = require('../Organism/Organism');
-const EnvironmentController = require('../Controllers/EnvironmentController');
-const Hyperparams = require('../Hyperparameters.js');
-const FossilRecord = require('../Stats/FossilRecord');
+import Environment from './Environment';
+import Renderer from '../Rendering/Renderer';
+import GridMap from '../Grid/GridMap';
+import Organism from '../Organism/Organism';
+import EnvironmentController from '../Controllers/EnvironmentController';
+import HyperParameters from '../Hyperparameters.js';
+import FossilRecord from '../Stats/FossilRecord';
+import { Mouth, Producer } from '../Organism/Cell/BodyCells/BodyCells';
+import { Empty, Food, Wall } from '../Organism/Cell/EnvironmentCells/EnvironmentCells';
 
 class WorldEnvironment extends Environment{
     constructor(cell_size, registry) {
@@ -13,7 +15,7 @@ class WorldEnvironment extends Environment{
         this.controller = new EnvironmentController(this, this.renderer.canvas);
         var grid_rows = Math.ceil(this.renderer.height / cell_size);
         var grid_cols = Math.ceil(this.renderer.width / cell_size);
-        this.grid_map = new GridMap(this, this.Registry.Cells, grid_cols, grid_rows, cell_size);
+        this.grid_map = new GridMap(this, grid_cols, grid_rows, cell_size);
         this.organisms = [];
         this.walls = [];
         this.total_mutability = 0;
@@ -33,7 +35,7 @@ class WorldEnvironment extends Environment{
                 to_remove.push(i);
             }
         }
-        if (Hyperparams.foodDropProb > 0) {
+        if (HyperParameters.foodDropProb > 0) {
             this.generateFood();
         }
         this.removeOrganisms(to_remove);
@@ -44,7 +46,7 @@ class WorldEnvironment extends Environment{
     }
 
     render() {
-        if (Hyperparams.headless) {
+        if (HyperParameters.headless) {
             this.renderer.cells_to_render.clear();
             return;
         }
@@ -70,9 +72,9 @@ class WorldEnvironment extends Environment{
     OriginOfLife() {
         var center = this.grid_map.getCenter();
         var org = new Organism(center[0], center[1], this);
-        org.anatomy.addDefaultCell(this.Registry.GetState('mouth'), 0, 0);
-        org.anatomy.addDefaultCell(this.Registry.GetState('producer'), 1, 1);
-        org.anatomy.addDefaultCell(this.Registry.GetState('producer'), -1, -1);
+        org.anatomy.addDefaultCell(Mouth, 0, 0);
+        org.anatomy.addDefaultCell(Producer, 1, 1);
+        org.anatomy.addDefaultCell(Producer, -1, -1);
         this.addOrganism(org);
         FossilRecord.addSpecies(org, null);
     }
@@ -88,23 +90,23 @@ class WorldEnvironment extends Environment{
     averageMutability() {
         if (this.organisms.length < 1)
             return 0;
-        if (Hyperparams.useGlobalMutability) {
-            return Hyperparams.globalMutability;
+        if (HyperParameters.useGlobalMutability) {
+            return globalMutability;
         }
         return this.total_mutability / this.organisms.length;
     }
 
-    changeCell(c, r, state, owner) {
-        super.changeCell(c, r, state, owner);
+    changeCell(c, r, type, owner) {
+        super.changeCell(c, r, type, owner);
         this.renderer.addToRender(this.grid_map.cellAt(c, r));
-        if(state == this.Registry.GetState('wall'))
+        if(type == Wall)
             this.walls.push(this.grid_map.cellAt(c, r));
     }
 
     clearWalls() {
         for(var wall of this.walls){
-            if (this.grid_map.cellAt(wall.col, wall.row).state == this.Registry.GetState('wall'))
-                this.changeCell(wall.col, wall.row, this.Registry.GetState('empty'), null);
+            if (this.grid_map.cellAt(wall.col, wall.row).type == Wall)
+                this.changeCell(wall.col, wall.row, Empty, null);
         }
     }
 
@@ -115,15 +117,15 @@ class WorldEnvironment extends Environment{
     }
 
     generateFood() {
-        var num_food = Math.max(Math.floor(this.grid_map.cols*this.grid_map.rows*Hyperparams.foodDropProb/50000), 1)
-        var prob = Hyperparams.foodDropProb;
+        var num_food = Math.max(Math.floor(this.grid_map.cols*this.grid_map.rows*HyperParameters.foodDropProb/50000), 1)
+        var prob = HyperParameters.foodDropProb;
         for (var i=0; i<num_food; i++) {
             if (Math.random() <= prob){
                 var c=Math.floor(Math.random() * this.grid_map.cols);
                 var r=Math.floor(Math.random() * this.grid_map.rows);
 
-                if (this.grid_map.cellAt(c, r).state == this.Registry.GetState('empty')){
-                    this.changeCell(c, r, this.Registry.GetState('food'), null);
+                if (this.grid_map.cellAt(c, r).type == Empty){
+                    this.changeCell(c, r, Food, null);
                 }
             }
         }
@@ -131,7 +133,7 @@ class WorldEnvironment extends Environment{
 
     reset() {
         this.organisms = [];
-        this.grid_map.fillGrid(this.Registry.GetState('empty'));
+        this.grid_map.fillGrid(Empty);
         this.renderer.renderFullGrid(this.grid_map.grid);
         this.total_mutability = 0;
         this.total_ticks = 0;
@@ -154,5 +156,5 @@ class WorldEnvironment extends Environment{
     }
 }
 
-module.exports = WorldEnvironment;
+export default WorldEnvironment;
 

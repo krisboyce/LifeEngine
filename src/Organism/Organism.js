@@ -246,13 +246,13 @@ class Organism {
     }
 
     isClear(col, row, rotation=this.rotation, ignore_armor=false) {
-        for(var loccell of this.anatomy.cells) {
-            var gridCell = this.getGridCell(loccell, col, row, rotation);
+        for(var bodyCell of this.anatomy.cells) {
+            var gridCell = this.getGridCell(bodyCell, col, row, rotation);
             if (gridCell==null) {
                 return false;
             }
 
-            if (gridCell.owner==this || gridCell.type == Empty || (!HyperParameters.foodBlocksReproduction && gridCell.type==Food) || (ignore_armor && loccell.getType()==Armor && gridCell.type==Food)){
+            if (gridCell.owner==this || gridCell.type == Empty || (!HyperParameters.foodBlocksReproduction && gridCell.type==Food) || (ignore_armor && bodyCell.getType()==Armor && gridCell.type==Food)){
                 continue;
             }
             return false;

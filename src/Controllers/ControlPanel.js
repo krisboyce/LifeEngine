@@ -1,10 +1,12 @@
 import HyperParameters from "../Hyperparameters";
 import { FoodDrop, WallDrop, ClickKill, Select, Edit, Clone, Drag } from "./ControlModes";
 import StatsPanel from "../Stats/StatsPanel";
+import { Cells } from "../Registry";
 
 class ControlPanel {
     constructor(engine) {
         this.engine = engine;
+        this.defineAbout();
         this.defineMinMaxControls();
         this.defineEngineSpeedControls();
         this.defineGridSizeControls();
@@ -22,6 +24,24 @@ class ControlPanel {
         this.headless_opacity = 1;
         this.opacity_change_rate = -0.8;
         this.paused=false;
+    }
+
+    defineAbout() {
+        					// 		<!-- <div class='cell-legend-type' id='mouth' title=""></div>
+							// <div class='cell-legend-type' id='producer' title="Producer: Produces adjacent food."></div>
+							// <div class='cell-legend-type' id='mover' title="Mover: Allows for movement and rotation."></div>
+							// <div class='cell-legend-type' id='killer' title="Killer: Harms oranisms in adjacent cells."></div>
+							// <div class='cell-legend-type' id='armor' title="Armor: Negates affects of killer cell."></div>
+							// <div class='cell-legend-type' id='eye' title="Eye: Observes cells and decides movement."></div>
+							// <div class='cell-legend-type' id='food' title=""></div>
+							// 
+        
+        for (let Cell of Cells.All()) {
+            console.log(Cell.state);
+            $('#cell-legend')
+                .append(`<div class='cell-legend-type' id='${Cell.state.name}' title="${Cell.state.description}"></div>`)
+            $('#'+Cell.state.name+'.cell-legend-type').css('background-color', Cell.state.color);
+        }
     }
 
     defineMinMaxControls(){

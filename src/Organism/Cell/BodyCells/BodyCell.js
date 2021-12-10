@@ -1,9 +1,23 @@
 import { up, down, left, right } from "../../Directions";
 import Cell from "../Cell";
+import { CellState } from "../CellState";
+import { CellTags } from "../CellTags";
 
 // A body cell defines the relative location of the cell in it's parent organism. It also defines their functional behavior.
 class BodyCell extends Cell {
-    constructor(org, loc_col, loc_row){
+    static state = new CellState(
+        'bodycell',
+        '#FFF',
+        'The base body cell.',
+        [CellTags.Living, CellTags.Observable],
+        super.state
+    );
+
+    static {
+        console.log(this.state)
+    }
+    
+    constructor(org, loc_col, loc_row) {
         super();
         this.org = org;
         this.loc_col = loc_col;
@@ -28,9 +42,7 @@ class BodyCell extends Cell {
         // initialize to default values 
     }
 
-    performFunction(env) {
-        // default behavior: none
-    }
+    
 
 
     getRealCol() {
@@ -41,7 +53,7 @@ class BodyCell extends Cell {
         return this.org.r + this.rotatedRow(this.org.rotation);
     }
 
-    getRealCell() {
+    getGridCell() {
         var real_c = this.getRealCol();
         var real_r = this.getRealRow();
         return this.org.env.grid_map.cellAt(real_c, real_r);
@@ -73,10 +85,7 @@ class BodyCell extends Cell {
         }
     }
 
-    render(ctx, cell, size) {
-        ctx.fillStyle = color;
-        ctx.fillRect(cell.x, cell.y, size, size);
-    }
+    
 }
 
 export default BodyCell;

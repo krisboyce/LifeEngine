@@ -47,12 +47,12 @@ class Renderer {
     }
 
     renderGridCell(gridCell) {
-        gridCell.type.state.render(this.ctx, gridCell, this.cell_size);
+        gridCell.type.render(this.ctx, gridCell, this.cell_size);
     }
 
     renderOrganism(org) {
         for(var org_cell of org.anatomy.cells) {
-            var cell = org.getRealCell(org_cell);
+            var cell = org.getGridCell(org_cell);
             this.renderGridCell(cell);
         }
     }
@@ -75,7 +75,7 @@ class Renderer {
 
     highlightOrganism(org) {
         for(var org_cell of org.anatomy.cells) {
-            var cell = org.getRealCell(org_cell);
+            var cell = org.getGridCell(org_cell);
             this.cells_to_highlight.add(cell);
         }
     }

@@ -1,10 +1,16 @@
 import BodyCell from "./BodyCell";
 import HyperParameters from "../../../Hyperparameters";
-import { BodyCellState } from "../CellState";
+import { CellState } from "../CellState";
 import { Armor, Killer } from "./BodyCells";
 
 class KillerCell extends BodyCell{
-    static state = new BodyCellState(KillerCell, "killer", "", "");
+    static state = new CellState(
+        "killer",
+        "#F82380",
+        "Killer: Harms oranisms in adjacent cells.",
+        [],
+        super.state
+    );
 
     constructor(org, loc_col, loc_row){
         super(org, loc_col, loc_row);

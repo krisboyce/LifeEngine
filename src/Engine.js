@@ -28,8 +28,8 @@ class Engine {
         this.env = new WorldEnvironment(5, this.registry);
         this.organism_editor = new OrganismEditor(this.registry);
         this.controlpanel = new ControlPanel(this);
-        this.colorscheme = new ColorScheme(this.env, this.organism_editor);
-        this.colorscheme.loadColorScheme();
+        this.env.renderer.renderFullGrid(this.env.grid_map.grid);
+        this.organism_editor.renderer.renderFullGrid(this.organism_editor.grid_map.grid);
         this.env.OriginOfLife();
         this.last_update = Date.now();
         this.delta_time = 0;

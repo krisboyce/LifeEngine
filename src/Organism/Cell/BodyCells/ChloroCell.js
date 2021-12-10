@@ -1,9 +1,15 @@
 import HyperParameters from "../../../Hyperparameters";
-import { BodyCellState } from "../CellState";
+import { CellState } from "../CellState";
 import BodyCell from "./BodyCell";
 
 class ChloroCell extends BodyCell{
-    static state = new BodyCellState(ChloroCell, "chloro", "", "");
+    static state = new CellState(
+        "chloro",
+        "",
+        "",
+        [],
+        super.state
+    );
 
     constructor(org, loc_col, loc_row){
         super(org, loc_col, loc_row);

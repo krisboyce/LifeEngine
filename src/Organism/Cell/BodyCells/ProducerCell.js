@@ -1,11 +1,18 @@
 import BodyCell from "./BodyCell";
 import HyperParameters from "../../../Hyperparameters";
-import { BodyCellState } from "../CellState";
+import { CellState } from "../CellState";
 import { Empty, Food } from "../EnvironmentCells/EnvironmentCells";
 
 class ProducerCell extends BodyCell{
-    static state = new BodyCellState(ProducerCell, "producer", "", "");
-    constructor(org, loc_col, loc_row){
+    static state = new CellState(
+        "producer",
+        "#15DE59",
+        "Producer: Produces adjacent food.",
+        [],
+        super.state
+    );
+    
+    constructor(org, loc_col, loc_row) {
         super(org, loc_col, loc_row);
         this.org.anatomy.is_producer = true;
     }

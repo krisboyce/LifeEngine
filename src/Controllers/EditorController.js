@@ -35,7 +35,7 @@ export default class EditorController extends CanvasController{
         if (this.edit_cell_type == null || this.mode != Edit)
             return;
         if (this.left_click){
-            if(this.edit_cell_type == Eye && this.cur_cell.getType() == Eye) {
+            if(this.edit_cell_type == Eye && this.cur_cell.type == Eye) {
                 var loc_cell = this.getCurLocalCell();
                 loc_cell.direction = rotateRight(loc_cell.direction);
                 this.env.renderFull();
